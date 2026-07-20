@@ -18,7 +18,7 @@ Native iOS SDK for [Antifraud.id](https://antifraud.id) device fingerprinting an
    ```
    https://github.com/antifraud-id/sdk-ios.git
    ```
-4. Choose **Up to Next Major Version** from `1.0.0`
+4. Choose **Up to Next Major Version** from `1.0.1`
 5. Add **AntifraudSDK** to your target
 
 ### Via Package.swift
@@ -27,7 +27,7 @@ Add the dependency to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/antifraud-id/sdk-ios.git", from: "1.0.0")
+    .package(url: "https://github.com/antifraud-id/sdk-ios.git", from: "1.0.1")
 ]
 ```
 
