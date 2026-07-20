@@ -5,22 +5,33 @@ Native iOS SDK for [Antifraud.id](https://antifraud.id) device fingerprinting an
 ## Requirements
 
 - iOS 13.0+
-- Swift 5.0+
-- CocoaPods 1.10+
+- Swift 5.9+
+- Xcode 15+
 
-## Installation
+## Installation (Swift Package Manager)
 
-Add the following to your `Podfile`:
+### Via Xcode
 
-```ruby
-pod 'AntifraudSDK', '~> 1.0.0'
+1. Open your project in Xcode
+2. Go to **File > Add Package Dependencies...**
+3. Enter the repository URL:
+   ```
+   https://github.com/antifraud-id/sdk-ios.git
+   ```
+4. Choose **Up to Next Major Version** from `1.0.0`
+5. Add **AntifraudSDK** to your target
+
+### Via Package.swift
+
+Add the dependency to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/antifraud-id/sdk-ios.git", from: "1.0.0")
+]
 ```
 
-Then run:
-
-```bash
-pod install
-```
+Then add `"AntifraudSDK"` to the dependencies of any target that needs it.
 
 ## Usage
 
@@ -30,6 +41,7 @@ Initialize once at app launch in your `AppDelegate`:
 
 ```swift
 import UIKit
+import AntifraudSDK
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -58,6 +70,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 Call `createSession()` before sensitive events (registrations, logins, checkouts). Always implement a **fail-open strategy**:
 
 ```swift
+import AntifraudSDK
+
 func handleCheckout(amount: Double) async {
     var sessionId: String? = nil
 

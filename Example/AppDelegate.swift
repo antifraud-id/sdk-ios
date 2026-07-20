@@ -1,4 +1,5 @@
 import UIKit
+import AntifraudSDK
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

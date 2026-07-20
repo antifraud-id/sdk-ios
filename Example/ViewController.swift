@@ -1,4 +1,5 @@
 import UIKit
+import AntifraudSDK
 
 class ViewController: UIViewController {
 
