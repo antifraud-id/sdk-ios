@@ -1,6 +1,6 @@
 # Antifraud iOS SDK
 
-Native iOS SDK for [Antifraud.id](https://antifraud.id) device fingerprinting and fraud detection. The SDK collects hardware specifications, OS attributes, carrier metadata, location signals, and deep security diagnostics (jailbreak, emulator, debugger, mock location, and tampering hooks), encrypts the payload using hybrid RSA-OAEP + AES-GCM cryptography, and exchanges it for a stable `session_id` via the Antifraud API.
+Native iOS SDK for [Antifraud.id](https://antifraud.id) device fingerprinting and fraud detection. The SDK collects hardware specifications, OS attributes, carrier metadata, location signals, and deep security diagnostics (jailbreak, emulator, debugger, mock location, and tampering hooks), encrypts the payload using hybrid RSA-OAEP + AES-GCM cryptography, and exchanges it for a stable `sessionId` via the Antifraud API.
 
 ## Requirements
 
@@ -101,9 +101,9 @@ Add the following to your app's `Info.plist` if you want location signal profili
 | Category | Signals |
 |----------|---------|
 | **Device Identity** | Stable UUID stored in Keychain (survives app reinstalls) |
-| **Network** | Carrier name, VPN detection, connection type (WiFi/4G/5G/etc) |
-| **Hardware** | CPU architecture, total memory, free storage, screen resolution, battery level/charging, uptime |
-| **Security** | Jailbreak detection, emulator detection, debugger attachment, Frida/Xposed/Substrate hooks, app binary signature hash |
+| **Network** | Carrier name, connection type (WiFi/4G/5G/etc); IP is server-observed |
+| **Hardware** | CPU architecture, total memory, screen resolution, battery level/charging, uptime |
+| **Security** | Jailbreak detection, emulator detection, debugger attachment, Frida/Xposed/Substrate hooks |
 | **Location** | Latitude, longitude, horizontal accuracy (graceful `0.0` when permissions absent) |
 
 ## License

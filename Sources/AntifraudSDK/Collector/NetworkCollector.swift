@@ -5,31 +5,15 @@ import Network
 enum NetworkCollector {
 
     static func getNetworkInfo() -> NetworkInfo {
-        let isVpn = isVpnConnected()
         let carrierName = getCarrierName()
         let connType = getConnectionType()
 
         return NetworkInfo(
-            ip: "",
-            connectionType: connType,
+            ip: "", // Left empty, server-observed
+            isp: "",
             carrier: carrierName,
-            isVpnActive: isVpn
+            connectionType: connType
         )
-    }
-
-    private static func isVpnConnected() -> Bool {
-        guard let cfDict = CFNetworkCopySystemProxySettings() else { return false }
-        let nsDict = cfDict.takeRetainedValue() as NSDictionary
-        guard let keys = nsDict["__SCOPED__"] as? NSDictionary else { return false }
-        for key in keys.allKeys {
-            if let name = key as? String {
-                let lowerName = name.lowercased()
-                if lowerName.contains("tap") || lowerName.contains("tun") || lowerName.contains("ppp") || lowerName.contains("ipsec") || lowerName.contains("vpn") {
-                    return true
-                }
-            }
-        }
-        return false
     }
 
     private static func getCarrierName() -> String {

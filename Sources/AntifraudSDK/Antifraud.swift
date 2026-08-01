@@ -3,6 +3,7 @@ import CoreLocation
 
 public class Antifraud: NSObject {
     public static let shared = Antifraud()
+    public static let sdkVersion = "ios-1.0.1"
 
     private var projectId: String?
     private var publicKey: String?
@@ -41,12 +42,14 @@ public class Antifraud: NSObject {
         let manufacturer = DeviceCollector.getManufacturer()
 
         let networkInfo = NetworkCollector.getNetworkInfo()
-        let hardwareInfo = DeviceCollector.getHardwareInfo()
-        let locationInfo = LocationCollector.shared.getLocationInfo()
+        let screenInfo = DeviceCollector.getScreenInfo()
+        let batteryInfo = DeviceCollector.getBatteryInfo()
+        let gpsInfo = LocationCollector.shared.getLocationInfo()
         let appInfo = AppInfoCollector.getAppInfo()
+        let uptime = DeviceCollector.getUptime()
 
         var isMock = false
-        if #available(iOS 15.0, *) {
+        if #available(iOS 15.0, macOS 12.0, *) {
             if let loc = CLLocationManager().location {
                 isMock = loc.sourceInformation?.isSimulatedBySoftware ?? false
             }
@@ -54,22 +57,35 @@ public class Antifraud: NSObject {
 
         let securityInfo = SecurityCollector.getSecurityInfo(mockLocationDetected: isMock)
 
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let collectedAt = formatter.string(from: Date())
+        // Stable device hash — FNV-1a over hardware signals identical across
+        // app reinstalls on the same physical device. The engine uses it to
+        // unify identity across SDKs/browsers.
+        let stableDeviceHash = fnv1a([
+            manufacturer,
+            model,
+            osVersion,
+            String(screenInfo.width),
+            String(screenInfo.height),
+            String(Int(screenInfo.dpi)),
+            DeviceCollector.getCpuArchitecture(),
+            String(DeviceCollector.getTotalMemoryMB())
+        ].joined(separator: "|"))
 
         let deviceInfo = DeviceInfo(
             deviceId: deviceId,
             platform: platform,
             osVersion: osVersion,
-            model: model,
             manufacturer: manufacturer,
-            network: networkInfo,
-            hardware: hardwareInfo,
+            model: model,
+            appVersion: appInfo.appVersion,
+            buildNumber: appInfo.buildNumber,
+            stableDeviceHash: stableDeviceHash,
+            uptime: uptime,
             security: securityInfo,
-            location: locationInfo,
-            app: appInfo,
-            collectedAt: collectedAt
+            battery: batteryInfo,
+            network: networkInfo,
+            gps: gpsInfo,
+            screen: screenInfo
         )
 
         let payload = MobileSDKPayload(deviceInfo: deviceInfo)
@@ -90,5 +106,14 @@ public class Antifraud: NSObject {
         )
 
         return sessionId
+    }
+
+    private func fnv1a(_ input: String) -> String {
+        var hash: UInt32 = 0x811c9dc5
+        for byte in input.utf8 {
+            hash ^= UInt32(byte)
+            hash = hash &* 16777619
+        }
+        return String(format: "%08x", hash)
     }
 }

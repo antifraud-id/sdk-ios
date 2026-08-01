@@ -11,7 +11,7 @@ class LocationCollector: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
     }
 
-    func getLocationInfo() -> LocationInfo {
+    func getLocationInfo() -> GpsInfo {
         let status: CLAuthorizationStatus
         if #available(iOS 14.0, *) {
             status = locationManager.authorizationStatus
@@ -22,7 +22,7 @@ class LocationCollector: NSObject, CLLocationManagerDelegate {
         switch status {
         case .authorizedWhenInUse, .authorizedAlways:
             if let loc = locationManager.location {
-                return LocationInfo(
+                return GpsInfo(
                     latitude: loc.coordinate.latitude,
                     longitude: loc.coordinate.longitude,
                     accuracy: loc.horizontalAccuracy
@@ -32,6 +32,6 @@ class LocationCollector: NSObject, CLLocationManagerDelegate {
             break
         }
 
-        return LocationInfo(latitude: 0.0, longitude: 0.0, accuracy: 0.0)
+        return GpsInfo(latitude: 0.0, longitude: 0.0, accuracy: 0.0)
     }
 }

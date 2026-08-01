@@ -31,6 +31,7 @@ enum AntifraudSessionClient {
         request.timeoutInterval = Double(timeoutMs) / 1000.0
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(projectId, forHTTPHeaderField: "X-Antifraud-Project-ID")
+        request.setValue(Antifraud.sdkVersion, forHTTPHeaderField: "X-Antifraud-SDK-Version")
 
         let jsonDict = ["payload": encryptedPayload]
         let requestBody = try JSONSerialization.data(withJSONObject: jsonDict)
@@ -61,7 +62,7 @@ enum AntifraudSessionClient {
 
                 do {
                     if let jsonResult = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                       let sessionId = jsonResult["session_id"] as? String {
+                       let sessionId = jsonResult["sessionId"] as? String {
                         continuation.resume(returning: sessionId)
                     } else {
                         continuation.resume(throwing: NetworkError.decodingError)

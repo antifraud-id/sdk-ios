@@ -3,7 +3,6 @@ import UIKit
 #endif
 import Foundation
 import MachO
-import CryptoKit
 import CoreLocation
 
 enum SecurityCollector {
@@ -13,15 +12,13 @@ enum SecurityCollector {
         let emulator = isEmulator()
         let debugger = isDebuggerAttached()
         let tampered = isAppTampered()
-        let sigHash = getAppSignatureHash()
 
         return SecurityInfo(
-            isRootedOrJailbroken: jailbroken,
+            isRooted: jailbroken,
             isEmulator: emulator,
-            isMockLocation: mockLocationDetected,
             isDebuggerAttached: debugger,
             isAppTampered: tampered,
-            appSignatureHash: sigHash
+            isMockLocation: mockLocationDetected
         )
     }
 
@@ -136,14 +133,5 @@ enum SecurityCollector {
             }
         }
         return false
-    }
-
-    private static func getAppSignatureHash() -> String {
-        guard let mainBundleURL = Bundle.main.executableURL,
-              let data = try? Data(contentsOf: mainBundleURL) else {
-            return ""
-        }
-        let hash = SHA256.hash(data: data)
-        return hash.compactMap { String(format: "%02x", $0) }.joined()
     }
 }

@@ -25,56 +25,7 @@ enum DeviceCollector {
         return "Apple"
     }
 
-    static func getHardwareInfo() -> HardwareInfo {
-        let cpuArch = getCpuArchitecture()
-
-        let totalMemBytes = ProcessInfo.processInfo.physicalMemory
-        let totalMemMB = Int(totalMemBytes / (1024 * 1024))
-
-        var freeStorageMB = 0
-        if let attrs = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
-           let freeSize = attrs[.systemFreeSize] as? Int64 {
-            freeStorageMB = Int(freeSize / (1024 * 1024))
-        }
-
-        var screenRes = "unknown"
-        #if canImport(UIKit)
-        let screen = UIScreen.main
-        let scale = screen.scale
-        let width = Int(screen.bounds.width * scale)
-        let height = Int(screen.bounds.height * scale)
-        screenRes = "\(width)x\(height)"
-        #endif
-
-        var batteryLevel = -1
-        var isCharging = false
-
-        #if canImport(UIKit)
-        let wasEnabled = UIDevice.current.isBatteryMonitoringEnabled
-        UIDevice.current.isBatteryMonitoringEnabled = true
-        let level = UIDevice.current.batteryLevel
-        if level >= 0 {
-            batteryLevel = Int(level * 100.0)
-        }
-        let state = UIDevice.current.batteryState
-        isCharging = (state == .charging || state == .full)
-        UIDevice.current.isBatteryMonitoringEnabled = wasEnabled
-        #endif
-
-        let uptimeSec = Int64(ProcessInfo.processInfo.systemUptime)
-
-        return HardwareInfo(
-            cpuArchitecture: cpuArch,
-            totalMemory: totalMemMB,
-            freeStorage: freeStorageMB,
-            screenResolution: screenRes,
-            batteryLevel: batteryLevel,
-            isCharging: isCharging,
-            uptime: uptimeSec
-        )
-    }
-
-    private static func getCpuArchitecture() -> String {
+    static func getCpuArchitecture() -> String {
         var size = 0
         sysctlbyname("hw.machine", nil, &size, nil, 0)
         var machine = [CChar](repeating: 0, count: size)
@@ -90,6 +41,46 @@ enum DeviceCollector {
         #else
         return machineName
         #endif
+    }
+
+    static func getTotalMemoryMB() -> Int {
+        let totalMemBytes = ProcessInfo.processInfo.physicalMemory
+        return Int(totalMemBytes / (1024 * 1024))
+    }
+
+    static func getScreenInfo() -> ScreenInfo {
+        #if canImport(UIKit)
+        let screen = UIScreen.main
+        let scale = screen.scale
+        let width = Int(screen.bounds.width * scale)
+        let height = Int(screen.bounds.height * scale)
+        return ScreenInfo(width: width, height: height, dpi: Double(scale) * 160.0)
+        #else
+        return ScreenInfo(width: 0, height: 0, dpi: 0.0)
+        #endif
+    }
+
+    static func getBatteryInfo() -> BatteryInfo {
+        var batteryLevel = -1
+        var isCharging = false
+
+        #if canImport(UIKit)
+        let wasEnabled = UIDevice.current.isBatteryMonitoringEnabled
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        let level = UIDevice.current.batteryLevel
+        if level >= 0 {
+            batteryLevel = Int(level * 100.0)
+        }
+        let state = UIDevice.current.batteryState
+        isCharging = (state == .charging || state == .full)
+        UIDevice.current.isBatteryMonitoringEnabled = wasEnabled
+        #endif
+
+        return BatteryInfo(level: batteryLevel, isCharging: isCharging)
+    }
+
+    static func getUptime() -> Int64 {
+        return Int64(ProcessInfo.processInfo.systemUptime)
     }
 
     private static func getDeviceMachineName() -> String {
